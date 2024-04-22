@@ -88,8 +88,12 @@ def get_var(datacubedata, str_filter=None):
     _type_
         _description_
     """
-    dimensions = sorted(list(datacubedata.coords.dims.keys()))
-    variables = sorted(list(datacubedata.variables.keys() - dimensions))
+    # Use `.sizes` to get a dict of dimension names to lengths and extract keys from there
+    dimensions = sorted(datacubedata.sizes)
+
+    # Adjust how you determine variables to ensure you are excluding dimension names from the list of all variable names
+    variables = sorted([var for var in datacubedata.variables.keys() if var not in dimensions])
+
 
     if str_filter is not None:
         variables = filter_2_string_lists(variables, str_filter)
