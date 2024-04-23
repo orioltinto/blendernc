@@ -132,8 +132,9 @@ def registerBlenderNC():
     bpy.types.Scene.datacube_cache = defaultdict(None)
     # Register handlers
     handlers.frame_change_pre.append(bpy.types.Scene.update_all_images)
-    # TODO: Check why this handler causes hangs and if it is necessary to have it at all.
-    # handlers.render_pre.append(bpy.types.Scene.update_all_images)
+    # Add update_all_images handler for render_pre for versions before 4.0
+    if bpy.app.version < (4, 0, 0):
+        handlers.render_pre.append(bpy.types.Scene.update_all_images)
     handlers.load_post.append(load_handler)
     # Register node categories
     nodeitems_utils.register_node_categories(node_tree_name, node_categories)
@@ -150,7 +151,8 @@ def unregisterBlenderNC():
 
     # Delete from handlers
     handlers.frame_change_pre.remove(update_all_images)
-    handlers.render_pre.remove(update_all_images)
+    if bpy.app.version < (4, 0, 0):
+        handlers.render_pre.remove(update_all_images)
     handlers.load_post.remove(load_handler)
 
     nodeitems_utils.unregister_node_categories(node_tree_name)
